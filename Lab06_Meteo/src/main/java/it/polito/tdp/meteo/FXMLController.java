@@ -5,7 +5,12 @@
 package it.polito.tdp.meteo;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.TreeMap;
+
+import it.polito.tdp.meteo.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -21,7 +26,7 @@ public class FXMLController {
     private URL location;
 
     @FXML // fx:id="boxMese"
-    private ChoiceBox<?> boxMese; // Value injected by FXMLLoader
+    private ChoiceBox<Integer> boxMese; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnUmidita"
     private Button btnUmidita; // Value injected by FXMLLoader
@@ -32,6 +37,8 @@ public class FXMLController {
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
 
+	private Model model;
+
     @FXML
     void doCalcolaSequenza(ActionEvent event) {
 
@@ -39,9 +46,20 @@ public class FXMLController {
 
     @FXML
     void doCalcolaUmidita(ActionEvent event) {
-
+    	int mese = boxMese.getValue();
+    	Map<String, Double> medie = new TreeMap<String, Double>(model.getUmiditaMedia(mese));
+    	txtResult.clear();
+    	for(String m : medie.keySet())
+    		txtResult.appendText(m + " " + medie.get(m) + "\n");
     }
-
+    
+    void setModel (Model m) {
+    	this.model = m;
+    	ArrayList<Integer> mesi = new ArrayList<Integer>();
+    	for(int i=1; i<13; i++)
+    		mesi.add(i);
+    	this.boxMese.getItems().addAll(mesi);
+    }
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
         assert boxMese != null : "fx:id=\"boxMese\" was not injected: check your FXML file 'Scene.fxml'.";
