@@ -63,11 +63,11 @@ public class Model {
 			int costo = 0;
 			for(Rilevamento r : parziale) {
 				if(c.compareTo(r.getLocalita()) == 0) {
-					cons++;
+					cons++;	//controllo consecutivi
 					costo += r.getUmidita();
 				}
 				else {
-					if(cons > 0 && cons < 3)
+					if(cons > 0 && cons < NUMERO_GIORNI_CITTA_CONSECUTIVI_MIN)
 						return;
 					cons = 0;
 					costo += COST;
@@ -77,9 +77,9 @@ public class Model {
 			if(costo < costoMigliore) {
 				migliore = new ArrayList<Rilevamento>(parziale);
 				costoMigliore = costo;
+				System.out.println(costoMigliore);
+				return;
 			}
-			System.out.print(costo);
-			return;
 		}
 		
 		for(Citta c : citta) {
@@ -92,12 +92,12 @@ public class Model {
 			
 			
 			parziale.add(c.getRilevamenti().get(livello));
-			consecutivi.replace(c.getNome(), consecutivi.get(c.getNome())+1);
+			//consecutivi.replace(c.getNome(), consecutivi.get(c.getNome())+1);
 			c.increaseCounter();
 			cerca(parziale, livello+1, mese);
 			
 			parziale.remove(c.getRilevamenti().get(livello));
-			consecutivi.replace(c.getNome(), consecutivi.get(c.getNome())-1);
+			//consecutivi.replace(c.getNome(), consecutivi.get(c.getNome())-1);
 			c.setCounter(c.getCounter()-1);
 			//cerca(parziale, livello+1, mese);
 		}
