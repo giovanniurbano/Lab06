@@ -62,7 +62,7 @@ public class Model {
 		if(livello == NUMERO_GIORNI_TOTALI) { //controllo giorni totali
 			String c = "";
 			int cons = 1;
-			int costo = 0;
+			int costo = 0; // o 100?
 			for(Rilevamento r : parziale) {
 				if(c.compareTo(r.getLocalita()) == 0) { //controllo giorni consecutivi
 					cons++;	
