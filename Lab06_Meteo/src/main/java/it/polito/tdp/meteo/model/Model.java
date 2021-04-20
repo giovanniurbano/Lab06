@@ -72,7 +72,7 @@ public class Model {
 					if(!parziale.get(0).equals(r) && cons < NUMERO_GIORNI_CITTA_CONSECUTIVI_MIN)
 						return;
 					cons = 0;
-					costo += COST;
+					costo += COST + r.getUmidita();
 				}
 				c = r.getLocalita();
 			}
