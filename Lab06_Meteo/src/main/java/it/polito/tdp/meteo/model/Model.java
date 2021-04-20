@@ -36,12 +36,14 @@ public class Model {
 		citta = mDao.getCitta();
 	}
 
-	// of course you can change the String output with what you think works best
+	
 	public Map<String, Double> getUmiditaMedia(int mese) {
 		return mDao.getUmiditaMedia(mese);
 	}
 	
-	// of course you can change the String output with what you think works best
+	//LIVELLO = giorno 
+	//PARZIALE = lista di rilevamenti
+	
 	public List<Rilevamento> trovaSequenza(int mese) {
 		List<Rilevamento> parziale = new ArrayList<Rilevamento>();
 		migliore = new ArrayList<Rilevamento>();
@@ -59,15 +61,15 @@ public class Model {
 		//caso terminale
 		if(livello == NUMERO_GIORNI_TOTALI) { //controllo giorni totali
 			String c = "";
-			int cons = 0;
+			int cons = 1;
 			int costo = 0;
 			for(Rilevamento r : parziale) {
-				if(c.compareTo(r.getLocalita()) == 0) {
-					cons++;	//controllo consecutivi
+				if(c.compareTo(r.getLocalita()) == 0) { //controllo giorni consecutivi
+					cons++;	
 					costo += r.getUmidita();
 				}
 				else {
-					if(cons > 0 && cons < NUMERO_GIORNI_CITTA_CONSECUTIVI_MIN)
+					if(!parziale.get(0).equals(r) && cons < NUMERO_GIORNI_CITTA_CONSECUTIVI_MIN)
 						return;
 					cons = 0;
 					costo += COST;
@@ -83,7 +85,7 @@ public class Model {
 		}
 		
 		for(Citta c : citta) {
-			if(c.getCounter() == NUMERO_GIORNI_CITTA_MAX)
+			if(c.getCounter() == NUMERO_GIORNI_CITTA_MAX) //controllo giorni assoluti 
 				return;
 			
 			/*if(livello > 1)
@@ -91,12 +93,12 @@ public class Model {
 					consecutivi.replace(c.getNome(), 0);*/
 			
 			
-			parziale.add(c.getRilevamenti().get(livello));
+			parziale.add(c.getRilevamenti().get(livello));	//generazione sottoproblemi
 			//consecutivi.replace(c.getNome(), consecutivi.get(c.getNome())+1);
 			c.increaseCounter();
 			cerca(parziale, livello+1, mese);
 			
-			parziale.remove(c.getRilevamenti().get(livello));
+			parziale.remove(c.getRilevamenti().get(livello));	//BACKTRACKING
 			//consecutivi.replace(c.getNome(), consecutivi.get(c.getNome())-1);
 			c.setCounter(c.getCounter()-1);
 			//cerca(parziale, livello+1, mese);
@@ -130,7 +132,7 @@ public class Model {
 		}*/
 	}
 	
-	private int totUmidita(List<Rilevamento> parziale) {
+	/*private int totUmidita(List<Rilevamento> parziale) {
 		int tot = 0;
 		for(Rilevamento r : parziale) {
 			tot += r.getUmidita();
@@ -148,7 +150,7 @@ public class Model {
 			}
 		}
 		return rMin;
-	}
+	}*/
 	
 
 }
