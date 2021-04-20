@@ -20,7 +20,7 @@ public class Model {
 	private List<Citta> citta;
 	private Map<LocalDate, List<Rilevamento>> partenza;
 	private Map<String, Integer> consecutivi;
-	private Map<String, Integer> assoluti;
+	//private Map<String, Integer> assoluti;
 	private int costoMigliore;
 	
 	public Model() {
@@ -29,10 +29,11 @@ public class Model {
 		consecutivi.put("Genova", 0);
 		consecutivi.put("Torino", 0);
 		consecutivi.put("Milano", 0);
-		assoluti = new TreeMap<String, Integer>();
+		/*assoluti = new TreeMap<String, Integer>();
 		assoluti.put("Genova", 0);
 		assoluti.put("Torino", 0);
-		assoluti.put("Milano", 0);
+		assoluti.put("Milano", 0);*/
+		citta = mDao.getCitta();
 	}
 
 	// of course you can change the String output with what you think works best
@@ -46,6 +47,8 @@ public class Model {
 		migliore = new ArrayList<Rilevamento>();
 		costoMigliore = COST*100;
 		partenza = new TreeMap<LocalDate, List<Rilevamento>>(mDao.getAllRilevamentiMese(mese));
+		for(Citta c : citta)
+			c.setRilevamenti(mDao.getAllRilevamentiLocalitaMese(mese, c.getNome()));
 		
 		this.cerca(parziale, 0, mese);
 		
@@ -54,12 +57,52 @@ public class Model {
 	
 	private void cerca(List<Rilevamento> parziale, int livello, int mese) {
 		//caso terminale
-		if(livello == NUMERO_GIORNI_TOTALI) {
+		if(livello == NUMERO_GIORNI_TOTALI) { //controllo giorni totali
+			String c = "";
+			int cons = 0;
+			int costo = 0;
+			for(Rilevamento r : parziale) {
+				if(c.compareTo(r.getLocalita()) == 0) {
+					cons++;
+					costo += r.getUmidita();
+				}
+				else {
+					if(cons > 0 && cons < 3)
+						return;
+					cons = 0;
+					costo += COST;
+				}
+				c = r.getLocalita();
+			}
+			if(costo < costoMigliore) {
+				migliore = new ArrayList<Rilevamento>(parziale);
+				costoMigliore = costo;
+			}
+			System.out.print(costo);
 			return;
 		}
 		
-		int costo = this.calcolaCosto(parziale);
-		if(costo < costoMigliore && costo > 0) {
+		for(Citta c : citta) {
+			if(c.getCounter() == NUMERO_GIORNI_CITTA_MAX)
+				return;
+			
+			/*if(livello > 1)
+				if(!parziale.get(livello).getLocalita().equals(parziale.get(livello-1).getLocalita()))
+					consecutivi.replace(c.getNome(), 0);*/
+			
+			
+			parziale.add(c.getRilevamenti().get(livello));
+			consecutivi.replace(c.getNome(), consecutivi.get(c.getNome())+1);
+			c.increaseCounter();
+			cerca(parziale, livello+1, mese);
+			
+			parziale.remove(c.getRilevamenti().get(livello));
+			consecutivi.replace(c.getNome(), consecutivi.get(c.getNome())-1);
+			c.setCounter(c.getCounter()-1);
+			//cerca(parziale, livello+1, mese);
+		}
+		
+		/*if(costo < costoMigliore && costo > 0) {
 			migliore = new ArrayList<Rilevamento>(parziale);
 			costoMigliore = costo;
 			return;
@@ -80,19 +123,21 @@ public class Model {
 			consecutivi.replace(min.getLocalita(), consecutivi.get(min.getLocalita())-1);
 			assoluti.replace(min.getLocalita(), assoluti.get(min.getLocalita())-1);
 		}
-		/*partenza.get(d).remove(min);
-		min = this.minUmidita(partenza.get(d));
-		cerca(parziale, livello, mese);*/
-	}
-
-	private int calcolaCosto(List<Rilevamento> parziale) {
-		int costo = 0;
-		for(Rilevamento r : parziale) {
-			costo += COST + r.getUmidita();
-		}
-		return costo;
+		else {
+			partenza.get(d).remove(min);
+			min = this.minUmidita(partenza.get(d));
+			cerca(parziale, livello, mese);
+		}*/
 	}
 	
+	private int totUmidita(List<Rilevamento> parziale) {
+		int tot = 0;
+		for(Rilevamento r : parziale) {
+			tot += r.getUmidita();
+		}
+		return tot;
+	}
+
 	private Rilevamento minUmidita(List<Rilevamento> rr) {
 		int min = 100;
 		Rilevamento rMin = null;
