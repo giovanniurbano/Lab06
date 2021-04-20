@@ -1,6 +1,8 @@
 package it.polito.tdp.meteo.DAO;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import it.polito.tdp.meteo.model.Rilevamento;
 
@@ -10,11 +12,12 @@ public class TestMeteoDAO {
 		
 		MeteoDAO dao = new MeteoDAO();
 
-		List<Rilevamento> list = dao.getAllRilevamentiLocalitaMese(2, "Torino");
+		Map<LocalDate, List<Rilevamento>> list = dao.getAllRilevamentiMese(2);
 
 		// STAMPA: localita, giorno, mese, anno, umidita (%)
-		for (Rilevamento r : list) {
-			System.out.format("%-10s %2td/%2$2tm/%2$4tY %3d%%\n", r.getLocalita(), r.getData(), r.getUmidita());
+		for (LocalDate r : list.keySet()) {
+			//System.out.format("%-10s %2td/%2$2tm/%2$4tY %3d%%\n", r.getLocalita(), r.getData(), r.getUmidita());
+			System.out.println(r+" - "+list.get(r));
 		}
 		
 //		System.out.println(dao.getAllRilevamentiLocalitaMese(1, "Genova"));

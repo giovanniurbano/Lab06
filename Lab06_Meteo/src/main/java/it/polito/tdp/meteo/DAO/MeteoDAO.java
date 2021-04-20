@@ -4,8 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -28,8 +28,8 @@ public class MeteoDAO {
 			ResultSet rs = st.executeQuery();
 
 			while (rs.next()) {
-
-				Rilevamento r = new Rilevamento(rs.getString("Localita"), rs.getDate("Data"), rs.getInt("Umidita"));
+				LocalDate d = rs.getDate("Data").toLocalDate();
+				Rilevamento r = new Rilevamento(rs.getString("Localita"), d, rs.getInt("Umidita"));
 				rilevamenti.add(r);
 			}
 
@@ -89,8 +89,44 @@ public class MeteoDAO {
 			ResultSet rs = st.executeQuery();
 
 			while (rs.next()) {
-				Rilevamento r = new Rilevamento(rs.getString("Localita"), rs.getDate("Data"), rs.getInt("Umidita"));
+				LocalDate d = rs.getDate("Data").toLocalDate();
+				Rilevamento r = new Rilevamento(rs.getString("Localita"), d, rs.getInt("Umidita"));
 				rilevamenti.add(r);
+			}
+
+			conn.close();
+			return rilevamenti;
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public Map<LocalDate, List<Rilevamento>> getAllRilevamentiMese(int mese) {
+		final String sql = "SELECT Localita, Data, Umidita FROM situazione WHERE MONTH(DATA) = ? ORDER BY data ASC";
+
+		Map<LocalDate, List<Rilevamento>> rilevamenti = new TreeMap<LocalDate, List<Rilevamento>>();
+		
+		try {
+			Connection conn = ConnectDB.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, mese);
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+				LocalDate d = rs.getDate("Data").toLocalDate();
+				Rilevamento r = new Rilevamento(rs.getString("Localita"), d, rs.getInt("Umidita"));
+				if(rilevamenti.containsKey(r.getData())) {
+					rilevamenti.get(r.getData()).add(r);
+				}
+				else {
+					ArrayList<Rilevamento> rr = new ArrayList<Rilevamento>();
+					rr.add(r);
+					rilevamenti.put(d, rr);
+				}
+					
 			}
 
 			conn.close();

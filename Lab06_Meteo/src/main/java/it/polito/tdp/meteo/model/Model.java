@@ -1,8 +1,10 @@
 package it.polito.tdp.meteo.model;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import it.polito.tdp.meteo.DAO.MeteoDAO;
 
@@ -16,12 +18,21 @@ public class Model {
 	private MeteoDAO mDao;
 	private List<Rilevamento> migliore;
 	private List<Citta> citta;
-	private List<Rilevamento> partenza;
+	private Map<LocalDate, List<Rilevamento>> partenza;
+	private Map<String, Integer> consecutivi;
+	private Map<String, Integer> assoluti;
 	private int costoMigliore;
 	
 	public Model() {
 		mDao = new MeteoDAO();
-		citta = mDao.getCitta();
+		consecutivi = new TreeMap<String, Integer>();
+		consecutivi.put("Genova", 0);
+		consecutivi.put("Torino", 0);
+		consecutivi.put("Milano", 0);
+		assoluti = new TreeMap<String, Integer>();
+		assoluti.put("Genova", 0);
+		assoluti.put("Torino", 0);
+		assoluti.put("Milano", 0);
 	}
 
 	// of course you can change the String output with what you think works best
@@ -34,6 +45,7 @@ public class Model {
 		List<Rilevamento> parziale = new ArrayList<Rilevamento>();
 		migliore = new ArrayList<Rilevamento>();
 		costoMigliore = COST*100;
+		partenza = new TreeMap<LocalDate, List<Rilevamento>>(mDao.getAllRilevamentiMese(mese));
 		
 		this.cerca(parziale, 0, mese);
 		
@@ -46,29 +58,31 @@ public class Model {
 			return;
 		}
 		
-		for(Citta c : citta) {
-			partenza = new ArrayList<Rilevamento>(mDao.getAllRilevamentiLocalitaMese(mese, c.getNome()));
-			
-			if(c.getCounter() == NUMERO_GIORNI_CITTA_MAX)
-				return;
-				
-			if(c.getCounter() < NUMERO_GIORNI_CITTA_CONSECUTIVI_MIN) {
-				parziale.add(partenza.get(livello));
-				c.increaseCounter();
-				
-				cerca(parziale, livello+1, mese);
-				parziale.remove(partenza.get(livello));
-				c.setCounter(c.getCounter()-1);
-			}
-		}
-		
 		int costo = this.calcolaCosto(parziale);
-		if(costo < costoMigliore) {
+		if(costo < costoMigliore && costo > 0) {
 			migliore = new ArrayList<Rilevamento>(parziale);
 			costoMigliore = costo;
 			return;
 		}
 		
+		LocalDate d = LocalDate.of(2013, mese, livello+1);
+		Rilevamento min = this.minUmidita(partenza.get(d)); 
+		if(assoluti.get(min.getLocalita()) == NUMERO_GIORNI_CITTA_MAX ) {
+			return;
+		}
+		
+		if(consecutivi.get(min.getLocalita()) < NUMERO_GIORNI_CITTA_CONSECUTIVI_MIN) {
+			parziale.add(min);
+			consecutivi.replace(min.getLocalita(), consecutivi.get(min.getLocalita())+1);
+			assoluti.replace(min.getLocalita(), assoluti.get(min.getLocalita())+1);
+			cerca(parziale, livello+1, mese);
+			parziale.remove(min);
+			consecutivi.replace(min.getLocalita(), consecutivi.get(min.getLocalita())-1);
+			assoluti.replace(min.getLocalita(), assoluti.get(min.getLocalita())-1);
+		}
+		/*partenza.get(d).remove(min);
+		min = this.minUmidita(partenza.get(d));
+		cerca(parziale, livello, mese);*/
 	}
 
 	private int calcolaCosto(List<Rilevamento> parziale) {
@@ -77,6 +91,18 @@ public class Model {
 			costo += COST + r.getUmidita();
 		}
 		return costo;
+	}
+	
+	private Rilevamento minUmidita(List<Rilevamento> rr) {
+		int min = 100;
+		Rilevamento rMin = null;
+		for(Rilevamento r : rr) {
+			if(r.getUmidita() < min) {
+				min = r.getUmidita();
+				rMin = r;
+			}
+		}
+		return rMin;
 	}
 	
 
