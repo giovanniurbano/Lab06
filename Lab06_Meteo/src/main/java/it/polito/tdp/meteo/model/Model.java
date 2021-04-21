@@ -69,13 +69,13 @@ public class Model {
 			int costo = 0; // o 100?
 			for(Rilevamento r : parziale) {
 				if(c.compareTo(r.getLocalita()) == 0) { //controllo giorni consecutivi
-					cons++;	
+					//cons++;	
 					costo += r.getUmidita();
 				}
 				else {
-					if(cons < NUMERO_GIORNI_CITTA_CONSECUTIVI_MIN)
+					/*if(cons < NUMERO_GIORNI_CITTA_CONSECUTIVI_MIN)
 						return;
-					cons = 0;
+					cons = 0;*/
 					costo += COST + r.getUmidita();
 				}
 				c = r.getLocalita();
@@ -96,7 +96,9 @@ public class Model {
 				if(!parziale.get(livello).getLocalita().equals(parziale.get(livello-1).getLocalita()))
 					consecutivi.replace(c.getNome(), 0);*/
 			
-			
+			if(parziale.size() > 2 && !this.isValid(parziale, c)) //controllo consecutivi
+				continue;
+			else {
 			parziale.add(c.getRilevamenti().get(livello));	//generazione sottoproblemi
 			//consecutivi.replace(c.getNome(), consecutivi.get(c.getNome())+1);
 			c.increaseCounter();
@@ -106,6 +108,7 @@ public class Model {
 			//consecutivi.replace(c.getNome(), consecutivi.get(c.getNome())-1);
 			c.setCounter(c.getCounter()-1);
 			//cerca(parziale, livello+1, mese);
+			}
 		}
 		
 		/*if(costo < costoMigliore && costo > 0) {
@@ -134,6 +137,23 @@ public class Model {
 			min = this.minUmidita(partenza.get(d));
 			cerca(parziale, livello, mese);
 		}*/
+	}
+	
+	private boolean isValid(List<Rilevamento> parziale, Citta t) {
+		int j = 0;
+		if(parziale.get(parziale.size()-1).getLocalita().compareTo(t.getNome()) == 0) {
+			return true;
+		}
+		else {
+			for(int i=parziale.size()-3; i<parziale.size()-1; i++) {
+				if(parziale.get(parziale.size()-1).getLocalita().compareTo(parziale.get(i).getLocalita()) == 0)
+					j++;
+			}
+			if(j == 2)
+				return true;
+			else
+				return false;
+		}
 	}
 	
 	/*private int totUmidita(List<Rilevamento> parziale) {
