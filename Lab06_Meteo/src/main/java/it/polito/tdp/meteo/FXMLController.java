@@ -47,8 +47,9 @@ public class FXMLController {
     	int mese = boxMese.getValue();
     	List<Rilevamento> seq = new ArrayList<Rilevamento>(this.model.trovaSequenza(mese));
     	txtResult.clear();
-    	for(Rilevamento r : seq)
-    		txtResult.appendText(r.getLocalita() + "\n");
+    	for(int i=0; i<seq.size(); i++)
+    		txtResult.appendText("Giorno "+ (i+1) + ": " + seq.get(i).getLocalita() + "\n");
+    	txtResult.appendText("\nCosto totale: " + this.model.getCostoMigliore());
     }
 
     @FXML

@@ -41,6 +41,10 @@ public class Model {
 		return mDao.getUmiditaMedia(mese);
 	}
 	
+	public int getCostoMigliore() {
+		return costoMigliore;
+	}
+	
 	//LIVELLO = giorno 
 	//PARZIALE = lista di rilevamenti
 	
@@ -79,7 +83,7 @@ public class Model {
 			if(costo < costoMigliore) {
 				migliore = new ArrayList<Rilevamento>(parziale);
 				costoMigliore = costo;
-				System.out.println(costoMigliore);
+				//System.out.println(costoMigliore);
 				return;
 			}
 		}
