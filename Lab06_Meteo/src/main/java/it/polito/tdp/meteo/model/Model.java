@@ -68,15 +68,13 @@ public class Model {
 			int cons = 0;
 			int costo = 0; // o 100?
 			for(Rilevamento r : parziale) {
-				if(c.compareTo(r.getLocalita()) == 0) { //controllo giorni consecutivi
-					//cons++;	
-					costo += r.getUmidita();
-				}
-				else {
+				costo += r.getUmidita();
+				
+				if(c.compareTo(r.getLocalita()) != 0) {
 					/*if(cons < NUMERO_GIORNI_CITTA_CONSECUTIVI_MIN)
 						return;
 					cons = 0;*/
-					costo += COST + r.getUmidita();
+					costo += COST ;
 				}
 				c = r.getLocalita();
 			}
