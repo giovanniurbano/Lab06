@@ -60,8 +60,8 @@ public class Model {
 	private void cerca(List<Rilevamento> parziale, int livello, int mese) {
 		//caso terminale
 		if(livello == NUMERO_GIORNI_TOTALI) { //controllo giorni totali
-			String c = "";
-			int cons = 1;
+			String c = parziale.get(0).getLocalita();
+			int cons = 0;
 			int costo = 0; // o 100?
 			for(Rilevamento r : parziale) {
 				if(c.compareTo(r.getLocalita()) == 0) { //controllo giorni consecutivi
@@ -69,7 +69,7 @@ public class Model {
 					costo += r.getUmidita();
 				}
 				else {
-					if(!parziale.get(0).equals(r) && cons < NUMERO_GIORNI_CITTA_CONSECUTIVI_MIN)
+					if(cons < NUMERO_GIORNI_CITTA_CONSECUTIVI_MIN)
 						return;
 					cons = 0;
 					costo += COST + r.getUmidita();
