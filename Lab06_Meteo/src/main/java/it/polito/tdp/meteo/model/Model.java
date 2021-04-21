@@ -98,6 +98,12 @@ public class Model {
 			
 			if(parziale.size() > 2 && !this.isValid(parziale, c)) //controllo consecutivi
 				continue;
+			/*
+			 * SE AD ES. PARZIALE = [GE, GE, GE, GE, GE, MI] e c = GE IL CONTROLLO MI RITORNA FALSE
+			 * E CON IL return; ANDREI A TOGLIERE MILANO MA IN REALTA' PER ME IL PROBLEMA E' GENOVA,
+			 * PER CUI HO SCELTO DI UTILIZZARE continue; PER POTER CAMBIARE c NEL CORSO DELLO STESSO LIVELLO
+			 * SENZA TOGLIERE MILANO, MA LA SEQUENZA PER MARZO (E FORSE ALTRI MESI) NON E' OTTIMA
+			 */
 			else {
 			parziale.add(c.getRilevamenti().get(livello));	//generazione sottoproblemi
 			//consecutivi.replace(c.getNome(), consecutivi.get(c.getNome())+1);
